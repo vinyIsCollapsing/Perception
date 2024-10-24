@@ -1,37 +1,39 @@
-# Projeto: Transformée de Hough
+# Projet : Transformée de Hough
 
-Este projeto explora a detecção de contornos e linhas em imagens utilizando diferentes técnicas da visão computacional, incluindo a Transformada de Hough. O desenvolvimento começa com a extração de contornos com operadores Sobel e Scharr e evolui para a aplicação da Transformada de Hough.
+Ce projet explore la détection de contours et de lignes dans les images en utilisant différentes techniques de vision par ordinateur, y compris la Transformée de Hough. Le développement commence par l'extraction de contours avec les opérateurs Sobel et Scharr et évolue vers l'application de la Transformée de Hough.
 
-## Requisitos
+## Prérequis
 
-- OpenCV 4.x ou superior
-- C++11 ou superior
+- OpenCV 4.x ou supérieur
+- C++11 ou supérieur
 
-## Estrutura do Projeto
+## Structure du projet
 
-- **main.cpp**: Código principal com a implementação das funções de extração de contornos e Transformada de Hough.
-- **escalier.png**: Imagem utilizada como exemplo na fase de detecção de contornos.
-- **README.md**: Documentação do projeto.
+- **main.cpp** : Code principal avec l'implémentation des fonctions d'extraction de contours et de la Transformée de Hough.
+- **escalier.png** : Image utilisée comme exemple dans la phase de détection de contours.
+- **README.md** : Documentation du projet.
 
-## Questões e Desenvolvimento
+## Questions et Développement
 
-### Parte 1: Extração de Contornos com Sobel e Scharr
+### Partie 1 : Extraction des Contours avec Sobel et Scharr
 
-#### Enunciado
-Com a ajuda das funções Sobel e Scharr do OpenCV, extraia os contornos da imagem `escalier.png`.
+#### Enoncé
+Avec l'aide des fonctions Sobel et Scharr d'OpenCV, extrayez les contours de l'image `escalier.png`.
 
-#### Desenvolvimento
-Na primeira parte do projeto, foi implementada a extração de contornos utilizando os operadores Sobel e Scharr. As funções `aplicarSobel` e `aplicarScharr` foram criadas para facilitar a modularização do código. A imagem é carregada em escala de cinza para focar nas variações de intensidade, que são essenciais para a detecção de contornos.
+#### Développement
+Dans la première partie du projet, l'extraction des contours a été implémentée en utilisant les opérateurs Sobel et Scharr. Les fonctions `appliquerSobel` et `appliquerScharr` ont été créées pour faciliter la modularisation du code. L'image est chargée en niveaux de gris pour se concentrer sur les variations d'intensité, qui sont essentielles pour la détection des contours.
 
-#### Resultados
-As bordas da imagem `escalier.png` foram detectadas e exibidas em janelas separadas, permitindo a comparação entre os métodos Sobel e Scharr.
+#### Résultats
+Les bords de l'image `escalier.png` ont été détectés et affichés dans des fenêtres séparées, permettant de comparer les méthodes Sobel et Scharr.
 
-#### Instruções para Executar
+#### Instructions d'exécution
 
-1. Instale o OpenCV se ainda não tiver.
-2. Compile o código:
+1. Installez OpenCV si ce n'est pas déjà fait.
+2. Compilez le code :
+   ```bash
    g++ main.cpp -o main `pkg-config --cflags --libs opencv4`
    ./main
+
 
 ### Parte 2: Transformada de Hough para Detecção de Linhas
 

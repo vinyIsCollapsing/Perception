@@ -55,3 +55,5 @@
 
 - **Ouverture et Fermeture :**  
   L'opération d'ouverture est une érosion suivie d'une dilatation. Elle est utile pour supprimer de petites régions et lisser les bords des objets tout en maintenant la structure générale. La fermeture est une dilatation suivie d'une érosion, utile pour remplir de petits trous. Les deux sont appliqués en utilisant la fonction `morphologyEx` d'OpenCV dans le code.
+
+### Étudiants : Pedro Campos et Vinicius Rocha

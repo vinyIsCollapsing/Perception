@@ -26,7 +26,7 @@ void colorSimilarPixels(Mat &image, Scalar meanColor, double threshold);
 void selectROI(Mat &image);
 Scalar calculateMeanColor(const Mat &roi);
 void colorPixelsSimilarToMean(Mat &image, Scalar meanColor, double threshold);
-Mat segmentarObjetoPorCor(const Mat& image, const Scalar& limite_inferior, const Scalar& limite_superior);
+Mat colorirTonsDeAmareloELaranja(const Mat& imagem, const Scalar& limite_inferior, const Scalar& limite_superior);
 
 int main(){
     // Abrindo imagem
@@ -111,7 +111,7 @@ int main(){
     Scalar limite_superior(45, 255, 255); // Limite superior
 
     // Chama a função de segmentação
-    Mat resultado = segmentarObjetoPorCor(image, limite_inferior, limite_superior);
+    Mat resultado = colorirTonsDeAmareloELaranja(image, limite_inferior, limite_superior);
 
     // Exibe a imagem original e o resultado da segmentação
     namedWindow("Original Image", WINDOW_NORMAL);
@@ -269,17 +269,20 @@ void colorPixelsSimilarToMean(Mat &image, Scalar meanColor, double threshold) {
 
 // Exercice 5
 // Função para segmentar uma área específica da imagem com base nos valores HSV
-Mat segmentarObjetoPorCor(const Mat& image, const Scalar& limite_inferior, const Scalar& limite_superior) {
+Mat colorirTonsDeAmareloELaranja(const Mat& imagem, const Scalar& limite_inferior, const Scalar& limite_superior) {
     Mat imagem_hsv, mascara, resultado;
-
+    
     // Converte a imagem para o espaço de cor HSV
-    cvtColor(image, imagem_hsv, COLOR_BGR2HSV);
+    cvtColor(imagem, imagem_hsv, COLOR_BGR2HSV);
 
     // Cria a máscara com os limites de cor definidos
     inRange(imagem_hsv, limite_inferior, limite_superior, mascara);
 
-    // Aplica a máscara na imagem original para obter o resultado
-    bitwise_and(image, image, resultado, mascara);
+    // Copia a imagem original para a variável de resultado
+    resultado = imagem.clone();
+
+    // Altera os pixels correspondentes aos tons de amarelo e laranja para vermelho
+    resultado.setTo(Scalar(0, 0, 255), mascara);  // (0, 0, 255) é vermelho em BGR
 
     return resultado;
 }

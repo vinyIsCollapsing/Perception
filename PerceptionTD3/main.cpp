@@ -20,6 +20,9 @@ Mat desenharLinhasManual(const Mat& edges, const vector<pair<int, int>>& lines, 
 vector<Vec2f> aplicarTransformadaHough(const Mat& edges, double rho_resolution, double theta_resolution, int threshold);
 Mat desenharLinhas(const Mat& edges, const vector<Vec2f>& lines);
 
+Mat colorirTonsDeAmareloELaranja(const Mat& imagem, const Scalar& limite_inferior, const Scalar& limite_superior);
+void detectarBolaAmarela(Mat imagem);
+
 int main() {
     /*
     //Exercice 1
@@ -66,7 +69,6 @@ int main() {
     */
     //Exercice 4
     /*
-    */
     // Carregar a imagem
     string caminho = "escalierWithoutTree.png";
     Mat src = carregarImagem(caminho);
@@ -87,34 +89,27 @@ int main() {
     imshow("Detected Lines", dst);
 
     waitKey(0);
+    */
 
     //Exercice 5
     /* 
-    // Carregar a imagem
-    string caminho = "balle_small.jpg";
-    Mat src = carregarImagem(caminho);
-    if (src.empty()) return -1;
-
-    // Aplicar a detecção de bordas usando o detector de Canny
-    Mat edges = aplicarCanny(src, 100, 200);
-
-    // Aplicar a Transformada de Hough para detecção de linhas
-    vector<Vec2f> lines = aplicarTransformadaHough(edges, 1, CV_PI / 180, 200);
-
-    // Desenhar as linhas detectadas
-    Mat dst = desenharLinhas(edges, lines);
-
-    // Exibir a imagem original e a imagem com as linhas detectadas
-    imshow("Original Image", src);
-    imshow("Canny Image", edges);
-    imshow("Detected Lines", dst);
-
-    waitKey(0);
     */
+    // Carregar a imagem
+    Mat imagem = imread("balle.jpg");
+
+    if(imagem.empty()) {
+        cout << "Erro ao carregar a imagem!" << endl;
+        return -1;
+    }
+
+    // Detecta a bola amarela
+    detectarBolaAmarela(imagem);
+    waitKey(0);
 
     return 0;
 }
 
+// Exercice 1
 // Função para aplicar o operador Sobel
 Mat aplicarSobel(const Mat& imagem) {
     Mat sobelX, sobelY, sobelResultado;
@@ -145,6 +140,7 @@ Mat aplicarScharr(const Mat& imagem) {
     return scharrResultado;
 }
 
+// Funcao generica
 // Função para carregar a imagem
 Mat carregarImagem(const string& caminho) {
     Mat src = imread(caminho, IMREAD_GRAYSCALE);
@@ -154,6 +150,7 @@ Mat carregarImagem(const string& caminho) {
     return src;
 }
 
+// Exercice 3
 // Função para aplicar a detecção de bordas de Canny
 Mat aplicarCanny(const Mat& src, int low_threshold, int high_threshold) {
     Mat edges;
@@ -226,6 +223,7 @@ Mat desenharLinhasManual(const Mat& edges, const vector<pair<int, int>>& lines, 
     return dst;
 }
 
+// Exercice 4
 // Função para aplicar a Transformada de Hough
 vector<Vec2f> aplicarTransformadaHough(const Mat& edges, double rho_resolution, double theta_resolution, int threshold) {
     vector<Vec2f> lines;
@@ -251,4 +249,62 @@ Mat desenharLinhas(const Mat& edges, const vector<Vec2f>& lines) {
     }
 
     return dst;
+}
+
+// Exercice 5
+// Função para segmentar a bola amarela
+Mat segmentarBolaAmarela(const Mat& imagem) {
+    Mat imagem_hsv, mascara;
+    
+    // Converte a imagem para o espaço de cor HSV
+    cvtColor(imagem, imagem_hsv, COLOR_BGR2HSV);
+
+    // Limites de cor para a bola amarela (ajuste esses valores conforme necessário)
+    Scalar limite_inferior(20, 100, 100);  // Amarelo mais escuro
+    Scalar limite_superior(30, 255, 255);  // Amarelo mais claro
+
+    // Cria a máscara para isolar a bola amarela
+    inRange(imagem_hsv, limite_inferior, limite_superior, mascara);
+
+    return mascara;
+}
+
+// Função para detectar a bola amarela usando a Transformada de Hough
+void detectarBolaAmarela(Mat imagem) {
+    // Segmenta a bola amarela
+    Mat mascara = segmentarBolaAmarela(imagem);
+
+    // Aplica um blur para suavizar a imagem e reduzir ruídos
+    GaussianBlur(mascara, mascara, Size(9, 9), 3, 3);
+
+    // Detecta círculos usando a Transformada de Hough
+    vector<Vec3f> circulos;
+    HoughCircles(mascara, circulos, HOUGH_GRADIENT, 1, mascara.rows/8, 5, 40, 50, 750); // Ajuste nos parâmetros para maior sensibilidade
+
+    // Verifica se algum círculo foi detectado
+    if (circulos.size() == 0) {
+        cout << "Nenhum círculo foi detectado!" << endl;
+        return;
+    }
+
+    // Desenha os círculos detectados
+    for(size_t i = 0; i < circulos.size(); i++) {
+        Point centro(cvRound(circulos[i][0]), cvRound(circulos[i][1]));
+        int raio = cvRound(circulos[i][2]);
+
+        // Desenha o círculo do centro da bola
+        circle(imagem, centro, 3, Scalar(0, 255, 0), -1, 8, 0);
+
+        // Desenha o contorno da bola
+        circle(imagem, centro, raio, Scalar(255, 0, 0), 5, 8, 0);  // Linha de contorno mais grossa
+    }
+
+    // Redimensiona a imagem para 640x480
+    Mat imagem_redimensionada;
+    resize(imagem, imagem_redimensionada, Size(640, 480));
+
+    // Cria uma janela ajustável para exibir o resultado
+    namedWindow("Deteccao de Bola Amarela", WINDOW_NORMAL);
+    imshow("Deteccao de Bola Amarela", imagem_redimensionada);
+    waitKey(0);
 }

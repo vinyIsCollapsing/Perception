@@ -26,6 +26,7 @@ void colorSimilarPixels(Mat &image, Scalar meanColor, double threshold);
 void selectROI(Mat &image);
 Scalar calculateMeanColor(const Mat &roi);
 void colorPixelsSimilarToMean(Mat &image, Scalar meanColor, double threshold);
+Mat segmentarObjetoPorCor(const Mat& image, const Scalar& limite_inferior, const Scalar& limite_superior);
 
 int main(){
     // Abrindo imagem
@@ -37,13 +38,15 @@ int main(){
         return 1;
     }
 
-    /*Exercice 1
+    //Exercice 1
+    /*
     namedWindow("Full Image", WINDOW_NORMAL);
     setMouseCallback("Full Image", mouseCallback, &image);
     imshow("Full Image", image);
     */
 
-    /*Exercice 2
+    //Exercice 2
+    /*
     Mat imageMonochrome = convetToMonochrome(image);
     namedWindow("Automatic Monochromatic Image", WINDOW_NORMAL);
     imshow("Automatic Monochromatic Image", imageMonochrome);
@@ -53,8 +56,8 @@ int main(){
     imshow("Manual Monochromatic Image", imageMonochromeManual);
     */
 
-    /* 
     // Exercice 3
+    /*
     capturedImage = image.clone();
 
     namedWindow("Clickable Image", WINDOW_NORMAL);
@@ -74,7 +77,9 @@ int main(){
         roi.release();
     }
     */
+
     // Exercice 4
+    /* 
     // Clonando a imagem original para ser manipulada
     capturedImage = image.clone();
 
@@ -98,6 +103,24 @@ int main(){
         imshow("Modified Image", capturedImage);
         waitKey(0); // Espera até que o usuário pressione uma tecla
     }
+    */
+
+    // Exercice 5
+    // Define os limites de cor para a seleção no espaço HSV
+    Scalar limite_inferior(5, 100, 100);  // Limite inferior para Hue, Saturação e Valor
+    Scalar limite_superior(45, 255, 255); // Limite superior
+
+    // Chama a função de segmentação
+    Mat resultado = segmentarObjetoPorCor(image, limite_inferior, limite_superior);
+
+    // Exibe a imagem original e o resultado da segmentação
+    namedWindow("Original Image", WINDOW_NORMAL);
+    imshow("Original Image", image);
+
+    namedWindow("HSV Image", WINDOW_NORMAL);
+    imshow("HSV Image", resultado);
+
+    waitKey(0);
     
     return 0;
 }
@@ -242,4 +265,21 @@ void colorPixelsSimilarToMean(Mat &image, Scalar meanColor, double threshold) {
             }
         }
     }
+}
+
+// Exercice 5
+// Função para segmentar uma área específica da imagem com base nos valores HSV
+Mat segmentarObjetoPorCor(const Mat& image, const Scalar& limite_inferior, const Scalar& limite_superior) {
+    Mat imagem_hsv, mascara, resultado;
+
+    // Converte a imagem para o espaço de cor HSV
+    cvtColor(image, imagem_hsv, COLOR_BGR2HSV);
+
+    // Cria a máscara com os limites de cor definidos
+    inRange(imagem_hsv, limite_inferior, limite_superior, mascara);
+
+    // Aplica a máscara na imagem original para obter o resultado
+    bitwise_and(image, image, resultado, mascara);
+
+    return resultado;
 }

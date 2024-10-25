@@ -41,3 +41,5 @@ Pour tester, il suffit de décommenter la section correspondante dans le `main`,
 *   **Complexité de l'algorithme** : La complexité temporelle de cet algorithme est approximativement \(O(N \cdot M)\) pour chaque image, où \(N\) et \(M\) représentent la largeur et la hauteur de l'image, respectivement. Cette complexité augmente proportionnellement au nombre d'images dans la vidéo.
 
 En décommentant les sections dans le `main`, vous pourrez tester chaque exercice comme demandé.
+
+### Étudiants : Pedro Campos et Vinicius Rocha

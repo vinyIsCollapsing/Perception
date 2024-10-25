@@ -1,5 +1,4 @@
 #include <opencv2/opencv.hpp>
-
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -8,19 +7,19 @@
 using namespace cv;
 using namespace std;
 
-// Definir constantes
-#define DEG2RAD 0.01745329251  // Fator de conversão de graus para radianos
+// Define constants
+#define DEG2RAD 0.01745329251  // Degree to radian conversion factor
 
-Mat aplicarSobel(const Mat& imagem);
-Mat aplicarScharr(const Mat& imagem);
-Mat carregarImagem(const string& caminho);
-Mat aplicarCanny(const Mat& src, int low_threshold, int high_threshold);
-vector<pair<int, int>> transformadaDeHoughManual(const Mat& edges, int threshold, int& max_dist, int& num_thetas, double& theta_step);
-Mat desenharLinhasManual(const Mat& edges, const vector<pair<int, int>>& lines, int max_dist, int num_thetas, double theta_step);
-vector<Vec2f> aplicarTransformadaHough(const Mat& edges, double rho_resolution, double theta_resolution, int threshold);
-Mat desenharLinhas(const Mat& edges, const vector<Vec2f>& lines);
-Mat colorirTonsDeAmareloELaranja(const Mat& imagem, const Scalar& limite_inferior, const Scalar& limite_superior);
-void detectarBolaAmarela(Mat imagem);
+Mat applySobel(const Mat& image);
+Mat applyScharr(const Mat& image);
+Mat loadImage(const string& path);
+Mat applyCanny(const Mat& src, int low_threshold, int high_threshold);
+vector<pair<int, int>> manualHoughTransform(const Mat& edges, int threshold, int& max_dist, int& num_thetas, double& theta_step);
+Mat drawManualLines(const Mat& edges, const vector<pair<int, int>>& lines, int max_dist, int num_thetas, double theta_step);
+vector<Vec2f> applyHoughTransform(const Mat& edges, double rho_resolution, double theta_resolution, int threshold);
+Mat drawLines(const Mat& edges, const vector<Vec2f>& lines);
+Mat colorYellowAndOrangeTones(const Mat& image, const Scalar& lower_bound, const Scalar& upper_bound);
+void detectYellowBall(Mat image);
 
 VideoCapture loadVideo(const string& videoPath);
 Mat getYellowMask(const Mat& frame);
@@ -30,65 +29,65 @@ void processVideo(VideoCapture& cap);
 
 int main() {
     /*
-    //Exercice 1
-    // Carregar a imagem
-    string caminho = "escalier.png";
-    Mat imagem = carregarImagem(caminho);
-    if (imagem.empty()) return -1;
+    // Exercise 1
+    // Load the image
+    string path = "escalier.png";
+    Mat image = loadImage(path);
+    if (image.empty()) return -1;
 
-    // Aplicar Sobel e Scharr
-    Mat sobelContornos = aplicarSobel(imagem);
-    Mat scharrContornos = aplicarScharr(imagem);
+    // Apply Sobel and Scharr
+    Mat sobelEdges = applySobel(image);
+    Mat scharrEdges = applyScharr(image);
 
-    // Exibir os resultados
-    imshow("Imagem Original", imagem);
-    imshow("Contornos Sobel", sobelContornos);
-    imshow("Contornos Scharr", scharrContornos);
+    // Display the results
+    imshow("Original Image", image);
+    imshow("Sobel Edges", sobelEdges);
+    imshow("Scharr Edges", scharrEdges);
 
-    // Aguardar a tecla de fechamento
+    // Wait for close key
     waitKey(0);
     */
     /*
-    // Exercice 3
-    string caminho = "escalierWithoutTree.png";
-    Mat src = carregarImagem(caminho);
+    // Exercise 3
+    string path = "escalierWithoutTree.png";
+    Mat src = loadImage(path);
     if (src.empty()) return -1;
 
-    // Aplicar a detecção de bordas de Canny
-    Mat edges = aplicarCanny(src, 100, 200);
+    // Apply Canny edge detection
+    Mat edges = applyCanny(src, 100, 200);
 
-    // Executar a Transformada de Hough
+    // Execute manual Hough Transform
     int max_dist, num_thetas;
     double theta_step;
-    vector<pair<int, int>> lines = transformadaDeHoughManual(edges, 200, max_dist, num_thetas, theta_step);
+    vector<pair<int, int>> lines = manualHoughTransform(edges, 200, max_dist, num_thetas, theta_step);
 
-    // Desenhar as linhas detectadas
-    Mat dst = desenharLinhasManual(edges, lines, max_dist, num_thetas, theta_step);
+    // Draw detected lines
+    Mat dst = drawManualLines(edges, lines, max_dist, num_thetas, theta_step);
 
-    // Exibir a imagem original e a imagem com as linhas detectadas
+    // Display original image and image with detected lines
     imshow("Original Image", src);
     imshow("Manual Canny Image", edges);
     imshow("Manual Detected Lines", dst);
 
     waitKey(0);
     */
-    //Exercice 4
+    // Exercise 4
+    // Load the image
     /*
-    // Carregar a imagem
-    string caminho = "escalierWithoutTree.png";
-    Mat src = carregarImagem(caminho);
+    string path = "escalierWithoutTree.png";
+    Mat src = loadImage(path);
     if (src.empty()) return -1;
 
-    // Aplicar a detecção de bordas usando o detector de Canny
-    Mat edges = aplicarCanny(src, 100, 200);
+    // Apply edge detection using Canny
+    Mat edges = applyCanny(src, 100, 200);
 
-    // Aplicar a Transformada de Hough para detecção de linhas
-    vector<Vec2f> lines = aplicarTransformadaHough(edges, 1, CV_PI / 180, 200);
+    // Apply Hough Transform for line detection
+    vector<Vec2f> lines = applyHoughTransform(edges, 1, CV_PI / 180, 200);
 
-    // Desenhar as linhas detectadas
-    Mat dst = desenharLinhas(edges, lines);
+    // Draw detected lines
+    Mat dst = drawLines(edges, lines);
 
-    // Exibir a imagem original e a imagem com as linhas detectadas
+    // Display original image and image with detected lines
     imshow("Original Image", src);
     imshow("Canny Image", edges);
     imshow("Detected Lines", dst);
@@ -96,26 +95,26 @@ int main() {
     waitKey(0);
     */
 
-    //Exercice 5
+    // Exercise 5
+    // Load the image
     /* 
-    // Carregar a imagem
-    Mat imagem = imread("balle.jpg");
+    Mat image = imread("balle.jpg");
 
-    if(imagem.empty()) {
-        cout << "Erro ao carregar a imagem!" << endl;
+    if(image.empty()) {
+        cout << "Error loading image!" << endl;
         return -1;
     }
 
-    // Detecta a bola amarela
-    detectarBolaAmarela(imagem);
+    // Detect the yellow ball
+    detectYellowBall(image);
     */
 
 
-    // Exercice 6
     /*
+    // Exercise 6
     VideoCapture cap = loadVideo("balle.mp4");
 
-    // Processar o vídeo para detectar a bola amarela
+    // Process the video to detect the yellow ball
     processVideo(cap);
 
     cap.release();
@@ -125,83 +124,83 @@ int main() {
     
 }
 
-// Exercice 1
-// Função para aplicar o operador Sobel
-Mat aplicarSobel(const Mat& imagem) {
-    Mat sobelX, sobelY, sobelResultado;
+// Exercise 1
+// Function to apply the Sobel operator
+Mat applySobel(const Mat& image) {
+    Mat sobelX, sobelY, sobelResult;
 
-    // Sobel nas direções X e Y
-    Sobel(imagem, sobelX, CV_64F, 1, 0, 3); // X-direction
-    Sobel(imagem, sobelY, CV_64F, 0, 1, 3); // Y-direction
+    // Sobel in X and Y directions
+    Sobel(image, sobelX, CV_64F, 1, 0, 3); // X-direction
+    Sobel(image, sobelY, CV_64F, 0, 1, 3); // Y-direction
 
-    // Calcular a magnitude do gradiente
-    magnitude(sobelX, sobelY, sobelResultado);
-    sobelResultado.convertTo(sobelResultado, CV_8U);
+    // Compute gradient magnitude
+    magnitude(sobelX, sobelY, sobelResult);
+    sobelResult.convertTo(sobelResult, CV_8U);
 
-    return sobelResultado;
+    return sobelResult;
 }
 
-// Função para aplicar o operador Scharr
-Mat aplicarScharr(const Mat& imagem) {
-    Mat scharrX, scharrY, scharrResultado;
+// Function to apply the Scharr operator
+Mat applyScharr(const Mat& image) {
+    Mat scharrX, scharrY, scharrResult;
 
-    // Scharr nas direções X e Y
-    Scharr(imagem, scharrX, CV_64F, 1, 0); // X-direction
-    Scharr(imagem, scharrY, CV_64F, 0, 1); // Y-direction
+    // Scharr in X and Y directions
+    Scharr(image, scharrX, CV_64F, 1, 0); // X-direction
+    Scharr(image, scharrY, CV_64F, 0, 1); // Y-direction
 
-    // Calcular a magnitude do gradiente
-    magnitude(scharrX, scharrY, scharrResultado);
-    scharrResultado.convertTo(scharrResultado, CV_8U);
+    // Compute gradient magnitude
+    magnitude(scharrX, scharrY, scharrResult);
+    scharrResult.convertTo(scharrResult, CV_8U);
 
-    return scharrResultado;
+    return scharrResult;
 }
 
-// Funcao generica
-// Função para carregar a imagem
-Mat carregarImagem(const string& caminho) {
-    Mat src = imread(caminho, IMREAD_GRAYSCALE);
+// Generic function
+// Function to load the image
+Mat loadImage(const string& path) {
+    Mat src = imread(path, IMREAD_GRAYSCALE);
     if (src.empty()) {
-        cout << "Erro ao carregar a imagem!" << endl;
+        cout << "Error loading image!" << endl;
     }
     return src;
 }
 
-// Exercice 3
-// Função para aplicar a detecção de bordas de Canny
-Mat aplicarCanny(const Mat& src, int low_threshold, int high_threshold) {
+// Exercise 3
+// Function to apply Canny edge detection
+Mat applyCanny(const Mat& src, int low_threshold, int high_threshold) {
     Mat edges;
     Canny(src, edges, low_threshold, high_threshold, 3);
     return edges;
 }
 
-// Função para executar a Transformada de Hough manual
-vector<pair<int, int>> transformadaDeHoughManual(const Mat& edges, int threshold, int& max_dist, int& num_thetas, double& theta_step) {
+// Function to perform manual Hough Transform
+vector<pair<int, int>> manualHoughTransform(const Mat& edges, int threshold, int& max_dist, int& num_thetas, double& theta_step) {
     int width = edges.cols;
     int height = edges.rows;
-    max_dist = sqrt(width * width + height * height); // Rho máximo
-    num_thetas = 180; // Número de ângulos
-    int num_rhos = 2 * max_dist; // Quantidade de valores de rho
+    max_dist = sqrt(width * width + height * height); // Maximum rho
+    num_thetas = 180; // Number of angles
+    int num_rhos = 2 * max_dist; // Number of rho values
     theta_step = CV_PI / num_thetas;
 
-    // Criar o acumulador
+    // Create the accumulator
     vector<vector<int>> accumulator(num_rhos, vector<int>(num_thetas, 0));
 
-    // População do acumulador
+    // Populate the accumulator
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            if (edges.at<uchar>(y, x) > 0) { // Detecção de ponto de borda
+            if (edges.at<uchar>(y, x) > 0) { // Edge point detection
                 for (int t = 0; t < num_thetas; t++) {
                     double theta = t * theta_step;
                     double rho = x * cos(theta) + y * sin(theta);
-                    int rho_idx = cvRound(rho + max_dist); // Índice de rho no acumulador
+                    int rho_idx = cvRound(rho + max_dist); // Rho index in the accumulator
                     accumulator[rho_idx][t]++;
                 }
             }
         }
     }
 
-    // Identificação dos picos no acumulador
-    vector<pair<int, int>> lines; // Armazena pares de (rho, theta)
+    // Identify peaks in the accumulator
+    vector<pair<int, int>> lines; // Stores pairs of (rho, theta)
 
     for (int r = 0; r < num_rhos; r++) {
         for (int t = 0; t < num_thetas; t++) {
@@ -214,8 +213,8 @@ vector<pair<int, int>> transformadaDeHoughManual(const Mat& edges, int threshold
     return lines;
 }
 
-// Função para desenhar as linhas detectadas
-Mat desenharLinhasManual(const Mat& edges, const vector<pair<int, int>>& lines, int max_dist, int num_thetas, double theta_step) {
+// Function to draw detected lines
+Mat drawManualLines(const Mat& edges, const vector<pair<int, int>>& lines, int max_dist, int num_thetas, double theta_step) {
     Mat dst;
     cvtColor(edges, dst, COLOR_GRAY2BGR);
 
@@ -239,16 +238,16 @@ Mat desenharLinhasManual(const Mat& edges, const vector<pair<int, int>>& lines, 
     return dst;
 }
 
-// Exercice 4
-// Função para aplicar a Transformada de Hough
-vector<Vec2f> aplicarTransformadaHough(const Mat& edges, double rho_resolution, double theta_resolution, int threshold) {
+// Exercise 4
+// Function to apply Hough Transform
+vector<Vec2f> applyHoughTransform(const Mat& edges, double rho_resolution, double theta_resolution, int threshold) {
     vector<Vec2f> lines;
     HoughLines(edges, lines, rho_resolution, theta_resolution, threshold, 350, 50);
     return lines;
 }
 
-// Função para desenhar as linhas detectadas
-Mat desenharLinhas(const Mat& edges, const vector<Vec2f>& lines) {
+// Function to draw detected lines
+Mat drawLines(const Mat& edges, const vector<Vec2f>& lines) {
     Mat dst;
     cvtColor(edges, dst, COLOR_GRAY2BGR);
 
@@ -256,7 +255,7 @@ Mat desenharLinhas(const Mat& edges, const vector<Vec2f>& lines) {
         float rho = lines[i][0], theta = lines[i][1];
         Point pt1, pt2;
         double a = cos(theta), b = sin(theta);
-        double x0 = a * rho, y0 = b * rho;
+        double x0 = a * rho, y0 = b * sin(theta);
         pt1.x = cvRound(x0 + 1000 * (-b));
         pt1.y = cvRound(y0 + 1000 * (a));
         pt2.x = cvRound(x0 - 1000 * (-b));
@@ -267,137 +266,137 @@ Mat desenharLinhas(const Mat& edges, const vector<Vec2f>& lines) {
     return dst;
 }
 
-// Exercice 5
-// Função para segmentar a bola amarela
-Mat segmentarBolaAmarela(const Mat& imagem) {
-    Mat imagem_hsv, mascara;
+// Exercise 5
+// Function to segment the yellow ball
+Mat segmentYellowBall(const Mat& image) {
+    Mat image_hsv, mask;
     
-    // Converte a imagem para o espaço de cor HSV
-    cvtColor(imagem, imagem_hsv, COLOR_BGR2HSV);
+    // Convert the image to HSV color space
+    cvtColor(image, image_hsv, COLOR_BGR2HSV);
 
-    // Limites de cor para a bola amarela (ajuste esses valores conforme necessário)
-    Scalar limite_inferior(20, 100, 100);  // Amarelo mais escuro
-    Scalar limite_superior(30, 255, 255);  // Amarelo mais claro
+    // Color bounds for yellow ball (adjust as needed)
+    Scalar lower_bound(20, 100, 100);  // Darker yellow
+    Scalar upper_bound(30, 255, 255);  // Lighter yellow
 
-    // Cria a máscara para isolar a bola amarela
-    inRange(imagem_hsv, limite_inferior, limite_superior, mascara);
+    // Create a mask to isolate the yellow ball
+    inRange(image_hsv, lower_bound, upper_bound, mask);
 
-    return mascara;
+    return mask;
 }
 
-// Função para detectar a bola amarela usando a Transformada de Hough
-void detectarBolaAmarela(Mat imagem) {
-    // Segmenta a bola amarela
-    Mat mascara = segmentarBolaAmarela(imagem);
+// Function to detect yellow ball using Hough Transform
+void detectYellowBall(Mat image) {
+    // Segment the yellow ball
+    Mat mask = segmentYellowBall(image);
 
-    // Aplica um blur para suavizar a imagem e reduzir ruídos
-    GaussianBlur(mascara, mascara, Size(9, 9), 3, 3);
+    // Apply blur to smooth the image and reduce noise
+    GaussianBlur(mask, mask, Size(9, 9), 3, 3);
 
-    // Detecta círculos usando a Transformada de Hough
-    vector<Vec3f> circulos;
-    HoughCircles(mascara, circulos, HOUGH_GRADIENT, 1, mascara.rows/8, 5, 40, 50, 750); // Ajuste nos parâmetros para maior sensibilidade
+    // Detect circles using Hough Transform
+    vector<Vec3f> circles;
+    HoughCircles(mask, circles, HOUGH_GRADIENT, 1, mask.rows/8, 5, 40, 50, 750); // Parameter adjustments for higher sensitivity
 
-    // Verifica se algum círculo foi detectado
-    if (circulos.size() == 0) {
-        cout << "Nenhum círculo foi detectado!" << endl;
+    // Check if any circles were detected
+    if (circles.size() == 0) {
+        cout << "No circles detected!" << endl;
         return;
     }
 
-    // Desenha os círculos detectados
-    for(size_t i = 0; i < circulos.size(); i++) {
-        Point centro(cvRound(circulos[i][0]), cvRound(circulos[i][1]));
-        int raio = cvRound(circulos[i][2]);
+    // Draw detected circles
+    for(size_t i = 0; i < circles.size(); i++) {
+        Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+        int radius = cvRound(circles[i][2]);
 
-        // Desenha o círculo do centro da bola
-        circle(imagem, centro, 3, Scalar(0, 255, 0), -1, 8, 0);
+        // Draw ball center
+        circle(image, center, 3, Scalar(0, 255, 0), -1, 8, 0);
 
-        // Desenha o contorno da bola
-        circle(imagem, centro, raio, Scalar(255, 0, 0), 5, 8, 0);  // Linha de contorno mais grossa
+        // Draw ball outline
+        circle(image, center, radius, Scalar(255, 0, 0), 5, 8, 0);  // Thicker outline
     }
 
-    // Redimensiona a imagem para 640x480
-    Mat imagem_redimensionada;
-    resize(imagem, imagem_redimensionada, Size(640, 480));
+    // Resize image to 640x480
+    Mat resized_image;
+    resize(image, resized_image, Size(640, 480));
 
-    // Cria uma janela ajustável para exibir o resultado
-    namedWindow("Deteccao de Bola Amarela", WINDOW_NORMAL);
-    imshow("Deteccao de Bola Amarela", imagem_redimensionada);
+    // Create a resizable window to display result
+    namedWindow("Yellow Ball Detection", WINDOW_NORMAL);
+    imshow("Yellow Ball Detection", resized_image);
     waitKey(0);
 }
 
-//Exerice 6
-// Função para carregar o vídeo
+// Exercise 6
+// Function to load the video
 VideoCapture loadVideo(const string& videoPath) {
     VideoCapture cap(videoPath);
     if (!cap.isOpened()) {
-        cerr << "Erro ao abrir o vídeo!" << endl;
+        cerr << "Error opening video!" << endl;
         exit(-1);
     }
     return cap;
 }
 
-// Função para aplicar a máscara para a cor amarela (agora ajustada para tons variados)
+// Function to apply a mask for yellow color (now adjusted for varied tones)
 Mat getYellowMask(const Mat& frame) {
     Mat hsvFrame, mask;
     
-    // Intervalo de cor ajustado para capturar tons variados de amarelo e laranja
-    Scalar lower_yellow_orange(15, 80, 100);    // Limite inferior mais amplo
-    Scalar upper_yellow_orange(30, 255, 255);  // Limite superior mais amplo
+    // Color range adjusted to capture varied yellow and orange tones
+    Scalar lower_yellow_orange(15, 80, 100);    // Broader lower limit
+    Scalar upper_yellow_orange(30, 255, 255);  // Broader upper limit
 
-    // Converter para espaço de cor HSV
+    // Convert to HSV color space
     cvtColor(frame, hsvFrame, COLOR_BGR2HSV);
 
-    // Criar a máscara para detectar tons de amarelo e laranja
+    // Create mask to detect yellow and orange tones
     inRange(hsvFrame, lower_yellow_orange, upper_yellow_orange, mask);
 
-    // Aplicar um blur para reduzir ruídos e uma operação morfológica para contornos mais precisos
+    // Apply blur to reduce noise and morphological operation for more precise contours
     GaussianBlur(mask, mask, Size(7, 7), 2, 2);
     morphologyEx(mask, mask, MORPH_CLOSE, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
     return mask;
 }
 
-// Função para detectar círculos usando a Transformada de Hough
+// Function to detect circles using Hough Transform
 vector<Vec3f> detectCircles(const Mat& mask) {
     vector<Vec3f> circles;
     HoughCircles(mask, circles, HOUGH_GRADIENT, 1, mask.rows / 8, 100, 20, 10, 100);
     return circles;
 }
 
-// Função para desenhar os círculos detectados no frame
+// Function to draw detected circles on the frame
 void drawCircles(Mat& frame, const vector<Vec3f>& circles) {
     for (size_t i = 0; i < circles.size(); i++) {
         Vec3f c = circles[i];
         Point center(cvRound(c[0]), cvRound(c[1]));
         int radius = cvRound(c[2]);
 
-        // Desenhar o centro do círculo
+        // Draw circle center
         circle(frame, center, 3, Scalar(0, 255, 0), -1, LINE_AA);
-        // Desenhar a borda do círculo
+        // Draw circle border
         circle(frame, center, radius, Scalar(0, 0, 255), 3, LINE_AA);
     }
 }
 
-// Função principal para processar o vídeo
+// Main function to process the video
 void processVideo(VideoCapture& cap) {
     while (true) {
         Mat frame;
         cap >> frame;
         if (frame.empty()) break;
 
-        // Obter a máscara para a cor amarela
+        // Get mask for yellow color
         Mat mask = getYellowMask(frame);
 
-        // Detectar círculos na máscara
+        // Detect circles in mask
         vector<Vec3f> circles = detectCircles(mask);
 
-        // Desenhar os círculos detectados
+        // Draw detected circles
         drawCircles(frame, circles);
 
-        // Exibir o resultado
-        imshow("Detecção de Bola Amarela", frame);
+        // Display result
+        imshow("Yellow Ball Detection", frame);
 
-        // Parar ao pressionar a tecla 'q'
+        // Stop on 'q' key press
         if (waitKey(30) == 'q') break;
     }
 }

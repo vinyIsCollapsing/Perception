@@ -1,90 +1,43 @@
-# Projet : Transformée de Hough
+### Exercice 1 : Gradient
 
-Ce projet explore la détection de contours et de lignes dans les images en utilisant différentes techniques de vision par ordinateur, y compris la Transformée de Hough. Le développement commence par l'extraction de contours avec les opérateurs Sobel et Scharr et évolue vers l'application de la Transformée de Hough.
+*   **Objectif** : Extraire les contours de l'image `escalier.png` en utilisant les fonctions Sobel et Scharr d'OpenCV.
+*   **Implémentation** : Dans le code fourni, les fonctions `applySobel` et `applyScharr` sont déjà définies pour appliquer les opérateurs Sobel et Scharr et extraire les contours d'une image. L'appel dans le `main` qui charge l'image `escalier.png` et affiche les contours de Sobel et Scharr est commenté. Il suffit de le décommenter pour réaliser cet exercice.
 
-## Prérequis
+### Exercice 2 : La méthode de Hough
 
-- OpenCV 4.x ou supérieur
-- C++11 ou supérieur
+*   **Objectif** : Écrire l'algorithme de la Transformée de Hough pour détecter les lignes, en identifiant les paramètres d'entrée.
+*   **Paramètres d'entrée pour la Transformée de Hough** :
+    *   **Image binaire** avec les contours détectés.
+    *   **Intervalle des angles (Theta)** : En général, de 0 à π.
+    *   **Intervalle des distances (Rho)**, calculé comme la distance maximale entre deux points de l'image.
+    *   **Accumulateur (matrice de votes)** : Comptabilise les votes des paramètres (rho et theta) pour chaque ligne potentielle.
+    *   **Seuil** : Le nombre minimum de votes pour considérer la présence d'une ligne en `(rho, theta)`.
 
-## Structure du projet
+### Exercice 3 : Implémentation
 
-- **main.cpp** : Code principal avec l'implémentation des fonctions d'extraction de contours et de la Transformée de Hough.
-- **escalier.png** : Image utilisée comme exemple dans la phase de détection de contours.
-- **README.md** : Documentation du projet.
+*   **Objectif** : Implémenter la Transformée de Hough en C++ pour l'image `escalier.png`.
+*   **Étapes pour terminer l'Exercice 3** :
+    1.  **Charger l'image** : Utilisez `loadImage` pour charger `escalierWithoutTree.png` en niveaux de gris.
+    2.  **Appliquer Canny** : Détectez les contours avec la fonction `applyCanny`.
+    3.  **Transformée de Hough manuelle** : Utilisez `manualHoughTransform` sur l'image avec contours pour identifier les lignes en fonction de l'accumulateur de votes.
+    4.  **Tracer les lignes** : Avec `drawManualLines`, dessinez les lignes détectées sur l'image de sortie.
 
-## Questions et Développement
+Pour tester, il suffit de décommenter la section correspondante dans le `main`, déjà préparée pour exécuter l'exercice 3 et afficher les résultats.
 
-### Partie 1 : Extraction des Contours avec Sobel et Scharr
+### Exercice 4 : OpenCV
 
-#### Enoncé
-Avec l'aide des fonctions Sobel et Scharr d'OpenCV, extrayez les contours de l'image `escalier.png`.
+*   **Objectif** : Tester la fonction `HoughLines` d'OpenCV et vérifier les résultats par rapport à l'implémentation manuelle.
+*   **Implémentation existante** : La fonction `applyHoughTransform` dans le code applique la Transformée de Hough en utilisant `HoughLines` d'OpenCV, et la fonction `drawLines` dessine les lignes détectées sur l'image. Pour vérifier si les résultats sont similaires, il suffit de décommenter la section du `main` correspondant à l'exercice 4.
 
-#### Développement
-Dans la première partie du projet, l'extraction des contours a été implémentée en utilisant les opérateurs Sobel et Scharr. Les fonctions `appliquerSobel` et `appliquerScharr` ont été créées pour faciliter la modularisation du code. L'image est chargée en niveaux de gris pour se concentrer sur les variations d'intensité, qui sont essentielles pour la détection des contours.
+### Exercice 5 : Localisation de balle
 
-#### Résultats
-Les bords de l'image `escalier.png` ont été détectés et affichés dans des fenêtres séparées, permettant de comparer les méthodes Sobel et Scharr.
+*   **Objectif** : Utiliser la Transformée de Hough pour localiser une balle jaune, en intégrant la détection de couleur, les opérations morphologiques et la Transformée de Hough.
+*   **Implémentation existante** : Le code contient déjà la fonction `detectYellowBall`, qui détecte une balle jaune en utilisant la Transformée de Hough sur un masque de couleur jaune. Le masque jaune est amélioré avec des opérations morphologiques pour une détection plus précise, satisfaisant l'intégration de la couleur et de la morphologie demandée.
 
-#### Instructions d'exécution
+### Exercice 6 : Localisation de balle dans une vidéo
 
-1. Installez OpenCV si ce n'est pas déjà fait.
-2. Compilez le code :
-   ```bash
-   g++ main.cpp -o main `pkg-config --cflags --libs opencv4`
-   ./main
+*   **Objectif** : Appliquer l'algorithme de l'exercice précédent pour détecter la balle dans une vidéo et analyser la complexité de l'algorithme.
+*   **Implémentation existante** : La fonction `processVideo` implémente déjà cette fonctionnalité, en chargeant la vidéo et en traitant chaque image avec le même algorithme de détection de la balle.
+*   **Complexité de l'algorithme** : La complexité temporelle de cet algorithme est approximativement \(O(N \cdot M)\) pour chaque image, où \(N\) et \(M\) représentent la largeur et la hauteur de l'image, respectivement. Cette complexité augmente proportionnellement au nombre d'images dans la vidéo.
 
-
-### Parte 2: Transformada de Hough para Detecção de Linhas
-
-#### Enunciado
-Escreva, no papel (ou no README), o algoritmo e as equações da Transformada de Hough no caso da busca por linhas. Quais são os parâmetros de entrada necessários para a implementação deste método?
-
-#### Algoritmo e Equações
-
-A Transformada de Hough é utilizada para a detecção de linhas em imagens, convertendo o problema de detecção de linhas no espaço da imagem em um problema de votação em um espaço paramétrico, conhecido como espaço de Hough.
-
-A equação de uma reta no plano cartesiano é convertida para sua **forma polar**:
-
-\[ \rho = x \cdot \cos(\theta) + y \cdot \sin(\theta) \]
-
-Onde:
-- \( \rho \) é a distância da linha até a origem.
-- \( \theta \) é o ângulo da normal da linha em relação ao eixo horizontal.
-- \( x \) e \( y \) são as coordenadas dos pontos de borda da imagem.
-
-#### Algoritmo da Transformada de Hough:
-
-1. **Pré-processamento**: Aplicar um detector de bordas (ex: Sobel, Canny) para identificar os pontos de borda da imagem.
-   
-2. **Espaço de Hough**: Para cada ponto de borda \( (x, y) \), calcular os possíveis valores de \( \rho \) e \( \theta \) utilizando a equação \( \rho = x \cdot \cos(\theta) + y \cdot \sin(\theta) \).
-
-3. **Acumulador**: Incrementar os votos no acumulador (uma matriz que registra quantas vezes cada par \( (\rho, \theta) \) aparece).
-
-4. **Detecção de Picos**: Identificar os picos no acumulador, que correspondem às linhas mais votadas no espaço de Hough.
-
-5. **Traçar as Linhas**: Converter os picos no espaço de Hough para o espaço da imagem e traçar as linhas detectadas.
-
-#### Parâmetros de Entrada Necessários:
-
-Para implementar a Transformada de Hough, são necessários os seguintes parâmetros:
-
-1. **Imagem de entrada**: Uma imagem binária ou de borda (obtida através de Sobel, Canny, etc.).
-2. **Resolução de \( \rho \)**: A resolução da distância \( \rho \) no acumulador (geralmente em pixels).
-3. **Resolução de \( \theta \)**: A resolução angular no acumulador (geralmente em radianos).
-4. **Limite de votos**: O número mínimo de votos necessários no acumulador para que uma linha seja detectada.
-5. **Intervalo de \( \theta \)**: Normalmente varia entre \( -\pi \) e \( \pi \).
-
-#### Exemplo Prático:
-
-No OpenCV, a Transformada de Hough pode ser implementada utilizando a função `HoughLines`, que recebe a imagem de entrada, as resoluções de \( \rho \) e \( \theta \), e o limite de votos:
-
-cv::HoughLines(image, lines, rho_resolution, theta_resolution, threshold);
-
-### Parte 3: Implementação da Transformada de Hough em C++
-
-#### Enunciado
-Implemente a Transformada de Hough para detecção de linhas em C++, utilizando apenas o OpenCV para visualizar a imagem final, mas sem utilizar a função pronta `HoughLines`.
-
-#### Desenvolvimento
-Nesta etapa, a Transformada de Hough foi implementada manualmente. A função que detecta linhas realiza os seguintes passos:
+En décommentant les sections dans le `main`, vous pourrez tester chaque exercice comme demandé.

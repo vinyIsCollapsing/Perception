@@ -58,3 +58,5 @@ Pour réaliser la sélection d'objets comme la balle et la chaise, l'espace HSV 
 - **Centre de la balle :** La fonction `calculateCenterOfGravity` calcule le centre de gravité en utilisant `moments` à partir du masque de sélection de la balle.
 
 - **Suivi dans la vidéo :** `detectAndMarkBall` applique un masque avec des limites HSV pour suivre la balle dans `balle.mp4`, et marque le centre avec un "X" bleu, en utilisant les limites HSV fournies.
+
+### Étudiants : Pedro Campos et Vinicius Rocha

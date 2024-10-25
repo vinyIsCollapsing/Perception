@@ -27,6 +27,8 @@ void selectROI(Mat &image);
 Scalar calculateMeanColor(const Mat &roi);
 void colorPixelsSimilarToMean(Mat &image, Scalar meanColor, double threshold);
 Mat colorirTonsDeAmareloELaranja(const Mat& imagem, const Scalar& limite_inferior, const Scalar& limite_superior);
+Point calcularCentroDeGravidade(const Mat& mascara);
+void detectarEMarcarBola(Mat& frame, const Scalar& limite_inferior, const Scalar& limite_superior);
 
 int main(){
     // Abrindo imagem
@@ -105,6 +107,7 @@ int main(){
     }
     */
 
+    /*
     // Exercice 5
     // Define os limites de cor para a seleção no espaço HSV
     Scalar limite_inferior(5, 100, 100);  // Limite inferior para Hue, Saturação e Valor
@@ -121,7 +124,38 @@ int main(){
     imshow("HSV Image", resultado);
 
     waitKey(0);
-    
+    */
+
+    //Exercice 6
+        // Carrega o vídeo
+    VideoCapture video("balle.mp4");
+    if (!video.isOpened()) {
+        cerr << "Erro ao carregar o vídeo!" << endl;
+        return -1;
+    }
+
+    // Define os limites de cor para a bola no espaço HSV
+    Scalar limite_inferior(10, 100, 100);   // Limite inferior para tons laranja/amarelo
+    Scalar limite_superior(30, 255, 255);   // Limite superior para tons mais amarelados
+
+    // Loop para processar cada quadro do vídeo
+    while (true) {
+        Mat frame;
+        video >> frame;  // Lê um novo quadro do vídeo
+        if (frame.empty()) break;  // Termina o loop ao final do vídeo
+
+        // Detecta e marca a bola no quadro
+        detectarEMarcarBola(frame, limite_inferior, limite_superior);
+
+        // Exibe o quadro com o "X" no centro da bola
+        imshow("Seguindo a Bola", frame);
+
+        // Pressione 'q' para sair do loop
+        if (waitKey(30) == 'q') break;
+    }
+
+    video.release();
+    destroyAllWindows();
     return 0;
 }
 
@@ -285,4 +319,37 @@ Mat colorirTonsDeAmareloELaranja(const Mat& imagem, const Scalar& limite_inferio
     resultado.setTo(Scalar(0, 0, 255), mascara);  // (0, 0, 255) é vermelho em BGR
 
     return resultado;
+}
+
+// Exercice 6
+Point calcularCentroDeGravidade(const Mat& mascara) {
+    Moments momentos = moments(mascara, true);
+    if (momentos.m00 != 0) {
+        int cx = static_cast<int>(momentos.m10 / momentos.m00);
+        int cy = static_cast<int>(momentos.m01 / momentos.m00);
+        return Point(cx, cy);
+    }
+    return Point(-1, -1); // Retorna (-1, -1) se não houver área na máscara
+}
+
+// Função para detectar e marcar o centro da bola em um quadro
+void detectarEMarcarBola(Mat& frame, const Scalar& limite_inferior, const Scalar& limite_superior) {
+    // Converte o quadro para o espaço HSV
+    Mat frame_hsv, mascara;
+    cvtColor(frame, frame_hsv, COLOR_BGR2HSV);
+
+    // Cria a máscara para detectar a bola com base nos limites de cor
+    inRange(frame_hsv, limite_inferior, limite_superior, mascara);
+
+    // Calcula o centro de gravidade da máscara
+    Point centro = calcularCentroDeGravidade(mascara);
+
+    // Se o centro for válido, desenha um "X" no centro da bola
+    if (centro.x != -1 && centro.y != -1) {
+        int tamanho = 10;  // Tamanho das linhas do "X"
+        // Linha diagonal superior esquerda para inferior direita
+        line(frame, Point(centro.x - tamanho, centro.y - tamanho), Point(centro.x + tamanho, centro.y + tamanho), Scalar(0, 0, 255), 2);
+        // Linha diagonal superior direita para inferior esquerda
+        line(frame, Point(centro.x + tamanho, centro.y - tamanho), Point(centro.x - tamanho, centro.y + tamanho), Scalar(0, 0, 255), 2);
+    }
 }

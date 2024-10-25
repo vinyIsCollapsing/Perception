@@ -19,9 +19,14 @@ vector<pair<int, int>> transformadaDeHoughManual(const Mat& edges, int threshold
 Mat desenharLinhasManual(const Mat& edges, const vector<pair<int, int>>& lines, int max_dist, int num_thetas, double theta_step);
 vector<Vec2f> aplicarTransformadaHough(const Mat& edges, double rho_resolution, double theta_resolution, int threshold);
 Mat desenharLinhas(const Mat& edges, const vector<Vec2f>& lines);
-
 Mat colorirTonsDeAmareloELaranja(const Mat& imagem, const Scalar& limite_inferior, const Scalar& limite_superior);
 void detectarBolaAmarela(Mat imagem);
+
+VideoCapture loadVideo(const string& videoPath);
+Mat getYellowMask(const Mat& frame);
+vector<Vec3f> detectCircles(const Mat& mask);
+void drawCircles(Mat& frame, const vector<Vec3f>& circles);
+void processVideo(VideoCapture& cap);
 
 int main() {
     /*
@@ -93,7 +98,6 @@ int main() {
 
     //Exercice 5
     /* 
-    */
     // Carregar a imagem
     Mat imagem = imread("balle.jpg");
 
@@ -104,9 +108,21 @@ int main() {
 
     // Detecta a bola amarela
     detectarBolaAmarela(imagem);
-    waitKey(0);
+    */
 
+
+    // Exercice 6
+    /*
+    VideoCapture cap = loadVideo("balle.mp4");
+
+    // Processar o vídeo para detectar a bola amarela
+    processVideo(cap);
+
+    cap.release();
+    destroyAllWindows();
+    */
     return 0;
+    
 }
 
 // Exercice 1
@@ -307,4 +323,81 @@ void detectarBolaAmarela(Mat imagem) {
     namedWindow("Deteccao de Bola Amarela", WINDOW_NORMAL);
     imshow("Deteccao de Bola Amarela", imagem_redimensionada);
     waitKey(0);
+}
+
+//Exerice 6
+// Função para carregar o vídeo
+VideoCapture loadVideo(const string& videoPath) {
+    VideoCapture cap(videoPath);
+    if (!cap.isOpened()) {
+        cerr << "Erro ao abrir o vídeo!" << endl;
+        exit(-1);
+    }
+    return cap;
+}
+
+// Função para aplicar a máscara para a cor amarela (agora ajustada para tons variados)
+Mat getYellowMask(const Mat& frame) {
+    Mat hsvFrame, mask;
+    
+    // Intervalo de cor ajustado para capturar tons variados de amarelo e laranja
+    Scalar lower_yellow_orange(15, 80, 100);    // Limite inferior mais amplo
+    Scalar upper_yellow_orange(30, 255, 255);  // Limite superior mais amplo
+
+    // Converter para espaço de cor HSV
+    cvtColor(frame, hsvFrame, COLOR_BGR2HSV);
+
+    // Criar a máscara para detectar tons de amarelo e laranja
+    inRange(hsvFrame, lower_yellow_orange, upper_yellow_orange, mask);
+
+    // Aplicar um blur para reduzir ruídos e uma operação morfológica para contornos mais precisos
+    GaussianBlur(mask, mask, Size(7, 7), 2, 2);
+    morphologyEx(mask, mask, MORPH_CLOSE, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+
+    return mask;
+}
+
+// Função para detectar círculos usando a Transformada de Hough
+vector<Vec3f> detectCircles(const Mat& mask) {
+    vector<Vec3f> circles;
+    HoughCircles(mask, circles, HOUGH_GRADIENT, 1, mask.rows / 8, 100, 20, 10, 100);
+    return circles;
+}
+
+// Função para desenhar os círculos detectados no frame
+void drawCircles(Mat& frame, const vector<Vec3f>& circles) {
+    for (size_t i = 0; i < circles.size(); i++) {
+        Vec3f c = circles[i];
+        Point center(cvRound(c[0]), cvRound(c[1]));
+        int radius = cvRound(c[2]);
+
+        // Desenhar o centro do círculo
+        circle(frame, center, 3, Scalar(0, 255, 0), -1, LINE_AA);
+        // Desenhar a borda do círculo
+        circle(frame, center, radius, Scalar(0, 0, 255), 3, LINE_AA);
+    }
+}
+
+// Função principal para processar o vídeo
+void processVideo(VideoCapture& cap) {
+    while (true) {
+        Mat frame;
+        cap >> frame;
+        if (frame.empty()) break;
+
+        // Obter a máscara para a cor amarela
+        Mat mask = getYellowMask(frame);
+
+        // Detectar círculos na máscara
+        vector<Vec3f> circles = detectCircles(mask);
+
+        // Desenhar os círculos detectados
+        drawCircles(frame, circles);
+
+        // Exibir o resultado
+        imshow("Detecção de Bola Amarela", frame);
+
+        // Parar ao pressionar a tecla 'q'
+        if (waitKey(30) == 'q') break;
+    }
 }

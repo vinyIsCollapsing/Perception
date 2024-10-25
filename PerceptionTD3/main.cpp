@@ -64,8 +64,9 @@ int main() {
 
     waitKey(0);
     */
-    /*
     //Exercice 4
+    /*
+    */
     // Carregar a imagem
     string caminho = "escalierWithoutTree.png";
     Mat src = carregarImagem(caminho);
@@ -86,9 +87,9 @@ int main() {
     imshow("Detected Lines", dst);
 
     waitKey(0);
-    */
 
-       //Exercice 5
+    //Exercice 5
+    /* 
     // Carregar a imagem
     string caminho = "balle_small.jpg";
     Mat src = carregarImagem(caminho);
@@ -109,6 +110,7 @@ int main() {
     imshow("Detected Lines", dst);
 
     waitKey(0);
+    */
 
     return 0;
 }
